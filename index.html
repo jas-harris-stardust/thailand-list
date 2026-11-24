@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thailand Shopping List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: 可愛、輕快，逛街時單手就能操作
+   IDEA: 戴粉紅蝴蝶結、披紅斗篷的虎斑小貓陪你逛街，買到東西就跳出來報喜
+   PICTURE: 頂部小貓＋對話框，清單是圓滾滾的貼紙卡
+   COLOUR and TYPE: 草莓牛奶粉＋芒果黃點綴、深梅色字；Mitr + Noto Sans TC
+   LAYOUT: 頂部角色與人名分頁、進度條、分組切換，一欄卡片 */
+:root{color-scheme:light dark;
+--bg:light-dark(#fff3f7,#21151c);--card:light-dark(#fff,#2e1f28);--ink:light-dark(#4a2236,#fbecf3);
+--mute:light-dark(#9a7387,#c7a9b8);--line:light-dark(#ffd9e6,#4a3040);
+--pink:#ff5c93;--pinkD:light-dark(#e23d77,#ff7aa8);--pinkS:light-dark(#ffe3ee,#4a2234);--mango:#ffc94d;--ok:light-dark(#fbeef3,#281a22)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Noto Sans TC",system-ui,sans-serif;overflow-x:clip}
+header{position:sticky;top:0;z-index:5;color:#fff;padding:14px max(4vw,16px) 0;
+ background:radial-gradient(circle,rgba(255,255,255,.22) 2.5px,transparent 3px) 0 0/22px 22px,linear-gradient(160deg,#ff86b0,#ff5c93)}
+.top{display:flex;align-items:center;gap:8px;max-width:680px;margin:0 auto}
+.ttl{flex:1}
+h1{font:600 26px/1.1 Mitr,"Noto Sans TC",sans-serif;margin:0 0 4px}
+.sub{font-size:13px;margin:0;opacity:.95}
+.bub{display:inline-block;background:#fff;color:#c2286a;font-size:13px;font-weight:700;border-radius:14px;padding:5px 11px;margin-top:8px;position:relative}
+.bub::after{content:"";position:absolute;right:-7px;top:50%;margin-top:-6px;border:6px solid transparent;border-left-color:#fff}
+.mas{width:92px;height:131px;flex:none;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(120,10,60,.35));margin-bottom:-6px;animation:bob 2.4s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+.tabs{display:flex;gap:3px;padding-top:8px;overflow-x:auto;overflow-y:hidden;max-width:680px;margin:10px -6px 0}@media(min-width:700px){.tabs{margin:10px auto 0}}
+.tabs button{flex:none;border:0;background:rgba(255,255,255,.28);color:#fff;font:700 14px "Noto Sans TC",sans-serif;padding:10px 3px;border-radius:16px 16px 0 0;position:relative;flex:1 1 auto;white-space:nowrap;min-height:44px;cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--bg);color:var(--pinkD)}
+.tabs b{position:absolute;top:-7px;right:-2px;font:700 11px/18px "Noto Sans TC";min-width:18px;height:18px;padding:0 4px;border-radius:99px;background:#ffc94d;color:#5a3a00;box-shadow:0 1px 3px rgba(120,10,60,.25)}
+
+main{max-width:680px;margin:0 auto;padding:16px max(4vw,14px) 90px}
+.bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.prog{flex:1;height:14px;background:var(--pinkS);border-radius:99px;overflow:hidden;border:2px solid var(--line)}
+.prog i{display:block;height:100%;border-radius:99px;transition:width .4s;background:repeating-linear-gradient(-45deg,var(--pink) 0 8px,#ff7fab 8px 16px)}
+.cnt{font:600 15px Mitr,sans-serif;white-space:nowrap;color:var(--pinkD)}
+.seg{display:flex;background:var(--card);border:2px solid var(--line);border-radius:99px;padding:4px;margin-bottom:6px}
+.seg button{flex:1;border:0;background:none;font:700 15px "Noto Sans TC",sans-serif;color:var(--mute);min-height:40px;border-radius:99px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--pink);color:#fff}
+h2{font:600 18px Mitr,"Noto Sans TC",sans-serif;margin:24px 0 10px;display:flex;align-items:center;gap:8px;color:var(--pinkD)}
+h2::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--mango);box-shadow:0 0 0 3px var(--pinkS)}
+h2 span{background:var(--mango);color:#5a3a00;font:700 12px "Noto Sans TC";padding:2px 9px;border-radius:99px}
+.card{display:grid;grid-template-columns:80px minmax(0,1fr) 48px;gap:12px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:22px;padding:8px;margin-bottom:10px;box-shadow:0 3px 0 var(--line);transition:opacity .2s,transform .2s}
+.card img{width:80px;height:80px;object-fit:cover;border-radius:16px;display:block;cursor:zoom-in;background:var(--ok)}
+.n{font-weight:700;font-size:16px;line-height:1.3}
+.d{font-size:13px;color:var(--mute);margin-top:2px}
+.tag{display:inline-block;font-size:12px;font-weight:700;color:var(--pinkD);background:var(--pinkS);border-radius:99px;padding:1px 9px;margin-top:5px;white-space:nowrap}
+.chk{width:44px;height:44px;border-radius:50%;border:2.5px dashed var(--pink);background:none;cursor:pointer;display:grid;place-items:center;color:transparent;font-size:20px;line-height:1}
+.chk:focus-visible,.tabs button:focus-visible,.seg button:focus-visible{outline:3px solid var(--mango);outline-offset:2px}
+.card.done{opacity:.5;background:var(--ok);box-shadow:none}.card.done .n{text-decoration:line-through}
+.card.done .chk{background:var(--pink);border:2.5px solid var(--pink);color:#fff}
+.card.pop{animation:pop .35s}
+@keyframes pop{40%{transform:scale(1.03)}}
+.multi{position:relative}.multi::after{content:attr(data-c);position:absolute;right:4px;bottom:4px;background:var(--pink);color:#fff;font-size:11px;font-weight:700;padding:0 6px;border-radius:99px}
+.empty{color:var(--mute);text-align:center;padding:30px 0}
+.amt{display:flex;align-items:center;gap:4px;margin-top:6px;background:var(--pinkS);border-radius:12px;padding:0 10px;max-width:180px}
+.amt span{font-weight:700;color:var(--pinkD)}
+.amt input,.rate input{border:0;background:none;font:700 16px "Noto Sans TC",sans-serif;color:var(--ink);width:100%;min-height:38px;outline:none}
+.amt:focus-within,.rate:focus-within{outline:3px solid var(--mango)}
+.sum{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:14px 16px;margin-top:18px;box-shadow:0 3px 0 var(--line)}
+.sr{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;font-weight:500}
+.sr b{font:600 22px Mitr,sans-serif;color:var(--pinkD);white-space:nowrap}
+.rate{justify-content:flex-start;background:var(--pinkS);border-radius:12px;padding:2px 12px;font-size:14px;white-space:nowrap}
+.rate input{width:80px;flex:1}
+#cp{width:100%;margin-top:10px;border:0;background:var(--pink);color:#fff;font:700 16px "Noto Sans TC",sans-serif;min-height:48px;border-radius:99px;cursor:pointer}
+.cpm{font-size:13px;color:var(--mute);margin:8px 0 0;white-space:pre-wrap;text-align:center;user-select:text}
+header{transition:padding .2s}
+header.mini{padding-top:8px}header.mini .sub,header.mini .bub{display:none}header.mini h1{font-size:19px;margin:0}
+header.mini .mas{position:absolute;right:max(3vw,10px);top:6px;width:74px;height:105px;margin:0}header.mini .tabs{margin-top:6px}
+.ctl{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.qty{display:flex;align-items:center;background:var(--pinkS);border-radius:12px}
+.qty button{border:0;background:none;color:var(--pinkD);font:700 20px/1 "Noto Sans TC",sans-serif;width:36px;height:38px;cursor:pointer}
+.qty b{min-width:16px;text-align:center;font:600 16px Mitr,sans-serif}.qty select{border:0;background:var(--card);color:var(--pinkD);font:700 13px "Noto Sans TC",sans-serif;border-radius:9px;height:30px;margin:0 4px 0 2px;padding:0 4px;cursor:pointer}.qty select:focus{outline:3px solid var(--mango)}
+.ctl .amt{margin-top:0;flex:1;min-width:84px}
+.noimg{width:80px;height:80px;border-radius:16px;background:var(--pinkS);color:var(--pinkD);display:grid;place-items:center;font-weight:700;cursor:zoom-in}
+.noimg.pf{background:linear-gradient(150deg,#fff0f6,#ffd3e4);color:#c2286a;font:600 14px/1.1 Mitr,sans-serif;text-align:center;padding:4px;box-shadow:inset 0 0 0 2px #ffc1d6}
+.del{border:0;background:none;color:var(--mute);font-size:13px;padding:6px 0 0;cursor:pointer;text-decoration:underline}
+.add{margin-top:18px;background:var(--card);border:2px dashed var(--pink);border-radius:22px;padding:4px 14px}
+.add summary{cursor:pointer;font-weight:700;color:var(--pinkD);min-height:44px;display:flex;align-items:center;list-style:none}
+.add summary::-webkit-details-marker{display:none}
+#af{display:grid;gap:8px;padding:4px 0 12px}
+#af input:not([type=file]),#af select{font:16px "Noto Sans TC",sans-serif;color:var(--ink);background:var(--pinkS);border:0;border-radius:12px;min-height:44px;padding:0 12px;width:100%}
+#af input:focus,#af select:focus{outline:3px solid var(--mango)}
+.file{font-size:14px;color:var(--mute);display:grid;gap:4px}.file input{font-size:14px}
+#af button{border:0;background:var(--pink);color:#fff;font:700 16px "Noto Sans TC",sans-serif;min-height:46px;border-radius:99px;cursor:pointer}
+.ask{color:#ffc94d;text-align:center;margin:14px 0 0;font-weight:700;font-size:15px}
+#lbth{color:#fff;text-align:center;font:600 24px/1.3 Mitr,sans-serif;padding:6px 16px 0}
+.foot{font-size:13px;color:var(--mute);margin-top:24px;text-align:center}
+#toast{position:fixed;left:50%;bottom:-140px;transform:translateX(-50%);z-index:15;display:flex;align-items:flex-end;gap:4px;transition:bottom .35s cubic-bezier(.3,1.5,.5,1);pointer-events:none}
+#toast.on{bottom:max(14px,env(safe-area-inset-bottom))}
+#toast img{width:80px;height:114px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(120,10,60,.35))}
+#toast p{margin:0 0 40px;background:#fff;color:#c2286a;font-weight:700;border:2px solid #ffc1d6;border-radius:18px;padding:8px 14px;white-space:nowrap;box-shadow:0 4px 14px rgba(200,40,100,.2)}
+#lb{position:fixed;inset:0;background:rgba(40,10,25,.92);z-index:20;display:none;flex-direction:column}
+#lb.on{display:flex}
+#lbs{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory}
+#lbs div{flex:0 0 100%;scroll-snap-align:center;display:grid;place-items:center;padding:16px}
+#lbs img{max-width:100%;max-height:78vh;border-radius:16px}
+#lbt{color:#f3d6e3;text-align:center;padding:4px 16px;font-size:14px}
+#lbx{color:#fff;background:none;border:0;font-size:16px;min-height:52px;cursor:pointer;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+@media(max-width:440px){h1{font-size:22px}}@media(max-width:380px){.mas{width:74px;height:105px}h1{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.mas{animation:none}.prog i,.card,#toast{transition:none}.card.pop{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="ttl">
+      <h1>Thailand Shopping List</h1>
+      <p class="sub">Bangkok · Pattaya　Nov 26–30</p>
+      <span class="bub" id="bub">一起去買買買！</span>
+    </div>
+    <img class="mas" src="img/cat.png" alt="">
+  </div>
+  <div class="tabs" role="tablist" id="tabs"></div>
+</header>
+<main>
+  <div class="bar" id="bar"><div class="prog"><i id="pi"></i></div><div class="cnt" id="cnt"></div></div>
+  <div class="seg" id="seg"><button data-g="store" aria-pressed="true">依店家</button><button data-g="cat" aria-pressed="false">依類別</button></div>
+  <div id="list"></div>
+  <p class="foot">點圖片可放大給店員看・所有紀錄只存在這支手機</p>
+</main>
+<div id="toast" aria-live="polite"><img src="img/cat.png" alt=""><p id="tm"></p></div>
+<div id="lb" role="dialog" aria-modal="true"><p class="ask">มีขายไหมคะ　有賣這個嗎？</p><div id="lbth"></div><div id="lbt"></div><div id="lbs"></div><button id="lbx">關閉</button></div>
+<script>
+{
+const STORES=['TOFU','屈臣氏／Boots','專櫃／機場','不確定在哪買','餐廳'];
+const CATS=['彩妝','保養','身體／日用','零食／保健','服飾','其他','美食'];
+const P={
+me:{name:'JAS',items:[
+['mz','Merrez\'ca Skin Up 粉底液','#02 Light Beige・SPF50','TOFU','彩妝',['mz1','mz2']],
+['ar','AR Velvet Matte 柔霧氣墊','Ivory Beige・SPF50 PA++++','TOFU','彩妝',['ar']],
+['u2a','4U2 唇膏','#18 Soul Mate','屈臣氏／Boots','彩妝',['u2a']],
+['u2b','4U2 唇膏（第二支）','色號待確認','屈臣氏／Boots','彩妝',['u2b']],
+['dz','Dazzle Me 定妝噴霧','Get a Grip・Matte Fix','屈臣氏／Boots','彩妝',['dazzle']],
+['acne','Clear Nose 抗痘凝膠','Acne Gel・綠色包','TOFU','保養',['acne']],
+['moist','Clear Nose 保濕凝膠','Moist Skin Barrier・藍色 MOIST','TOFU','保養',['moist']],
+['uv','Clear Nose 防曬精華','UV Sun Serum・SPF50+','TOFU','保養',['uv']],
+['sri','Srichand 15倍保濕安瓶面膜','Skin Moisture Burst','TOFU','保養',['sri']],
+['nest','Nestme 燕窩補水面膜','Hydro Boost Mask','屈臣氏／Boots','保養',['nest']],
+['pin','Pinnara 椰子油精華','Coconut Oil Serum・約 ฿229','屈臣氏／Boots','保養',['pin']],
+['bio','Bio Woman 髮膜','Super Treatment・有小包和大罐','TOFU','身體／日用',['bio']],
+['pp1','Pañpuri 身體油','','專櫃／機場','身體／日用',['pp1']],
+['pp2','Pañpuri 噴霧精油／護手霜','機場可買，辦會員有折扣','專櫃／機場','身體／日用',['pp2']],
+['balm','三個男人 薰衣草好睡膏','紫色小罐 Lavender Balm','不確定在哪買','身體／日用',['balm']],
+['col','Colgate Optic White O2 牙膏','泰國限定・兩種口味','TOFU','身體／日用',['colgate']],
+['nau','Nautilus 鮪魚抹醬＋餅乾','Classic','TOFU','零食／保健',['nautilus']],
+['chip','Tasto 鹹蛋黃洋芋片','Signature 黑色包','TOFU','零食／保健',['chips']],
+['fib','Fiber flow 纖維軟糖','15 小包裝','TOFU','零食／保健',['fiber']],
+['gn','G\'nite 洋甘菊助眠軟糖','','TOFU','零食／保健',['gnite']],
+['slip','Slip to Sleep 睡衣','免穿內衣的女生睡衣','專櫃／機場','服飾',['slip']]]},
+chen:{name:'陳怪廷',items:[
+['boat','Mama 船麵泡麵','Kuay Teow Reua・黑色包','TOFU','零食／保健',['boat']],
+['pink','Mama 粉紅湯粿條','Yen Ta Fo・粉紅麵','TOFU','零食／保健',['pink']],
+['clo','Clorets 葡萄涼糖','Grape Freeze・無糖','TOFU','零食／保健',['clo']]]},
+perf:{name:'香水',groups:['椰奶／寶寶香'],items:[
+['vca','Van Cleef & Arpels Santal Blanc','','','椰奶／寶寶香',[],'VCA'],
+['tfsb','Tom Ford Soleil Blanc EDP','前調椰子味很重，後調晚香玉，醇厚細滑奶香','','椰奶／寶寶香',[],'TF'],
+['coco','Youssoful Coco Hawaii','','','椰奶／寶寶香',[],'Coco'],
+['kil','Kilian Moonlight in Heaven EDP','椰奶芒果糯米飯，最後皂香作結','','椰奶／寶寶香',[],'Kilian'],
+['dior','Dior Hypnotic Poison EDT','美食調始祖，高甜度杏仁椰奶香','','椰奶／寶寶香',[],'Dior'],
+['sl','Serge Lutens Un Bois Vanille EDP','椰子香草，嗜甜的可入','','椰奶／寶寶香',[],'SL'],
+['loewe','Loewe Paula\'s Ibiza EDT','雞蛋花椰子，渡假風','','椰奶／寶寶香',[],'Loewe'],
+['mp','Matière Première Vanilla Powder','EDP／Extrait・椰子香草聖木','','椰奶／寶寶香',[],'MP'],
+['guer','Guerlain Coconut Fizz','清爽多汁的椰子','','椰奶／寶寶香',[],'Guerlain']]},
+thai:{name:'泰國香氛',groups:['泰國香氛品牌'],items:[
+['ppf','PAÑPURI','白茶、茉莉、木質調；包裝美，自用送禮都適合','','泰國香氛品牌',[],'Pañpuri'],
+['thann','THANN','耐聞不易踩雷，天然精油木質調','','泰國香氛品牌',[],'THANN'],
+['harnn','HARNN','泰式草本 SPA：檸檬草、米香、草藥','','泰國香氛品牌',[],'HARNN'],
+['karma','Karmakamet','曼谷文青系，店像復古藥草圖書館；木質、琥珀、草藥','','泰國香氛品牌',[],'Karma']]},
+eat:{name:'想吃',items:[
+['joe','Kuay Jab Mr. Joe','米其林脆皮豬・豬雜粿條湯，可加點一盤脆皮豬','餐廳','美食',['joe']]]}
+};
+const TH={mz:'เมอร์เรซกา สกิน อัพ ลิควิด ฟาวเดชั่น',ar:'คุชชั่น AR Velvet Matte',u2a:'ลิป 4U2 เบอร์ 18',u2b:'ลิป 4U2',dz:'สเปรย์ล็อคเมคอัพ Dazzle Me',
+acne:'เคลียร์โนส เจลสิว',moist:'เคลียร์โนส มอยส์เจอร์ไรเซอร์ เจล',uv:'เคลียร์โนส กันแดด',sri:'ศรีจันทร์ มาส์กหน้า',nest:'เนสท์มี มาส์กหน้า',
+pin:'พินนารา เซรั่มน้ำมันมะพร้าว',bio:'ไบโอ ทรีทเม้นท์',pp1:'ปัญญ์ปุริ ออยล์',pp2:'ปัญญ์ปุริ สเปรย์',balm:'ยาหม่องลาเวนเดอร์',col:'ยาสีฟันคอลเกต',
+nau:'นอติลุส ทูน่า แครกเกอร์',chip:'มันฝรั่งเทสโต ไข่เค็ม',fib:'Fiber flow กัมมี่',gn:'G\'nite กัมมี่',boat:'มาม่า ก๋วยเตี๋ยวเรือ',pink:'มาม่า เย็นตาโฟ',clo:'คลอเร็ท รสองุ่น',joe:'ก๋วยจั๊บ มิสเตอร์โจ'};
+const UNITS=['PACK','PIECES','BOTTLE','BAG'];
+const UNIT={mz:'PACK',ar:'PIECES',u2a:'PIECES',u2b:'PIECES',dz:'BOTTLE',acne:'PACK',moist:'PACK',uv:'PACK',sri:'PIECES',nest:'PIECES',pin:'BOTTLE',bio:'PACK',pp1:'BOTTLE',pp2:'BOTTLE',balm:'BOTTLE',col:'PIECES',nau:'PACK',chip:'BAG',fib:'BAG',gn:'BAG',slip:'PIECES',boat:'PACK',pink:'PACK',clo:'PACK'};
+const K='th-shop-v1';let S={tab:'me',g:'store',done:{},price:{},qty:{},unit:{},rate:'',custom:{me:[],chen:[],perf:[],thai:[],eat:[]}};
+try{const o=JSON.parse(localStorage.getItem(K)||'{}');S=Object.assign(S,o);S.qty=S.qty||{};S.unit=S.unit||{};S.custom=Object.assign({me:[],chen:[],perf:[],thai:[],eat:[]},S.custom||{})}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S));return true}catch(e){return false}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const key=(t,id)=>t+':'+id;
+const num=v=>{const n=parseFloat(String(v||'').replace(/,/g,''));return isFinite(n)?n:0};
+const items=t=>P[t].items.map(i=>({id:i[0],n:i[1],d:i[2],s:i[3],c:i[4],img:i[5].map(f=>`img/${f}.jpg`),th:TH[i[0]]||'',ab:i[6]||'',u:S.unit[i[0]]||UNIT[i[0]]||(P[t].groups?'BOTTLE':'PIECES')}))
+  .concat((S.custom[t]||[]).map(c=>({id:c.id,n:c.n,d:c.d,s:c.s,c:'其他',img:c.img?[c.img]:[],th:'',u:S.unit[c.id]||c.u||'PIECES',own:1})));
+const isDone=(t,id)=>!!S.done[key(t,id)];
+let delArm='';
+function render(){
+  const T=S.tab,buy=T!=='eat';
+  $('tabs').innerHTML=Object.entries(P).map(([k,p])=>{const left=items(k).filter(i=>!isDone(k,i.id)).length;
+    return `<button role="tab" data-t="${k}" aria-selected="${T===k}">${esc(p.name)}<b>${left}</b></button>`}).join('');
+  const its=items(T),dn=its.filter(i=>isDone(T,i.id)).length;
+  $('pi').style.width=(its.length?dn/its.length*100:0)+'%';
+  $('cnt').textContent=`${!!P[T].groups?'找到':buy?'已買':'吃過'} ${dn} / ${its.length}`;
+  $('seg').style.display=buy&&!P[T].groups?'':'none';
+  for(const b of $('seg').children)b.setAttribute('aria-pressed',b.dataset.g===S.g);
+  const pf=!!P[T].groups,byStore=S.g==='store'&&!pf,order=pf?P[T].groups.concat(['其他']):buy?(byStore?STORES:CATS):[null];
+  const html=order.map(g=>{
+    const rows=its.filter(i=>g===null||(byStore?i.s:i.c)===g);if(!rows.length)return'';
+    rows.sort((a,b)=>isDone(T,a.id)-isDone(T,b.id));
+    const left=rows.filter(i=>!isDone(T,i.id)).length;
+    return (g?`<h2>${esc(g)}${left?`<span>還有 ${left}</span>`:''}</h2>`:'')+rows.map(i=>{
+      const d=isDone(T,i.id),other=byStore?i.c:i.s,q=S.qty[i.id]||1;
+      const pic=i.img.length?`<img src="${esc(i.img[0])}" alt="${esc(i.n)}" data-z="${esc(i.id)}" loading="lazy">`:`<div class="noimg${pf?' pf':''}" data-z="${esc(i.id)}">${esc(i.ab||i.n.slice(0,2))}</div>`;
+      return `<div class="card${d?' done':''}">
+        <div class="${i.img.length>1?'multi':''}" data-c="${i.img.length}">${pic}</div>
+        <div><div class="n">${esc(i.n)}</div>${i.d?`<div class="d">${esc(i.d)}</div>`:''}${buy&&!pf&&other?`<span class="tag">${esc(other)}</span>`:''}
+        ${buy?`<div class="ctl"><div class="qty"><button data-q="${esc(i.id)}" data-v="-1" aria-label="減少">−</button><b>${q}</b><button data-q="${esc(i.id)}" data-v="1" aria-label="增加">+</button><select data-u="${esc(i.id)}" aria-label="單位">${UNITS.map(u=>`<option${u===i.u?' selected':''}>${u}</option>`).join('')}</select></div>
+        <label class="amt"><span>฿</span><input inputmode="decimal" data-p="${esc(i.id)}" value="${esc(S.price[i.id]||'')}" placeholder="總金額" aria-label="${esc(i.n)} 金額"></label></div>`:''}
+        ${i.own?`<button class="del" data-del="${esc(i.id)}">${delArm===i.id?'再按一次刪除':'刪除'}</button>`:''}</div>
+        <button class="chk" data-k="${esc(i.id)}" aria-pressed="${d}" aria-label="${d?'取消':'標記'}${esc(i.n)}">♥</button></div>`}).join('')}).join('');
+  $('list').innerHTML=(html||'<p class="empty">這裡還沒有東西</p>')+addForm(T)+(buy?sumBox(T):'');
+  if(buy)sum();
+  const left=its.length-dn;
+  $('bub').textContent=!!P[T].groups?(left?`還有 ${left} 款要找！`:'全部找到啦！'):left===0?(buy?'全部買齊啦！':'都吃到啦，好飽！'):(buy?`還有 ${left} 樣要買！`:`還有 ${left} 家要吃！`);
+}
+function addForm(T){const buy=T!=='eat';
+  return `<details class="add"><summary>＋ 新增${!!P[T].groups?(T==='thai'?'想逛的品牌':'想找的香水'):buy?'想買的東西':'想吃的店'}</summary><form id="af">
+  <input id="an" required placeholder="${buy?'品名':'店名'}" maxlength="60">
+  <input id="ad" placeholder="備註（色號、口味、地點…）" maxlength="80">
+  ${buy?`<select id="au">${UNITS.map(u=>`<option>${u}</option>`).join('')}</select>`:''}
+  ${buy&&!P[T].groups?`<select id="as">${STORES.filter(s=>s!=='餐廳').map(s=>`<option${s==='TOFU'?' selected':''}>${esc(s)}</option>`).join('')}</select>`:''}
+  <label class="file">加照片（可不加）<input id="af2" type="file" accept="image/*"></label>
+  <button>加入清單</button><p id="am" class="cpm"></p></form></details>`}
+function sumBox(T){return `<div class="sum"><div class="sr"><span>${T==='chen'?'代購合計':'我花了'}</span><b id="tot"></b></div>
+  <label class="sr rate"><span>匯率 1 泰銖 =</span><input id="rate" inputmode="decimal" placeholder="例如 0.95" value="${esc(S.rate||'')}"><span>台幣</span></label>
+  <div class="sr"><span>約台幣</span><b id="twd"></b></div>${T==='chen'?'<button id="cp">複製收款明細</button><p id="cpm" class="cpm"></p>':''}</div>`}
+function sum(){const t=items(S.tab).reduce((a,i)=>a+num(S.price[i.id]),0),r=num(S.rate);
+  if($('tot')){$('tot').textContent='฿ '+t.toLocaleString('en-US',{maximumFractionDigits:2});
+  $('twd').textContent=r?'NT$ '+Math.round(t*r).toLocaleString('en-US'):'先填匯率'}return t}
+function shrink(file){return new Promise((ok,no)=>{const u=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{const s=Math.min(1,360/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*s);cv.height=Math.round(im.height*s);
+    cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);ok(cv.toDataURL('image/jpeg',.7))};im.onerror=no;im.src=u})}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;S.tab=b.dataset.t;delArm='';save();render();scrollTo(0,0)});
+$('seg').addEventListener('click',e=>{const b=e.target.closest('[data-g]');if(!b)return;S.g=b.dataset.g;save();render()});
+$('list').addEventListener('input',e=>{const t=e.target;
+  if(t.dataset.p!==undefined){S.price[t.dataset.p]=t.value;save();sum()}
+  else if(t.dataset.u!==undefined){S.unit[t.dataset.u]=t.value;save()}
+  else if(t.id==='rate'){S.rate=t.value;save();sum()}});
+$('list').addEventListener('submit',async e=>{e.preventDefault();const T=S.tab,n=$('an').value.trim();if(!n)return;
+  let img='';const f=$('af2').files[0];if(f){try{img=await shrink(f)}catch(x){}}
+  const it={id:'c'+Date.now(),n,d:$('ad').value.trim(),u:($('au')&&$('au').value)||'PACK',s:$('as')?$('as').value:(T==='eat'?'餐廳':''),img};
+  S.custom[T].push(it);if(!save()&&img){it.img='';save();$('am').textContent='手機空間不足，照片沒存到'}
+  render();toast(T==='eat'?'記下來了！':'加進清單囉！')});
+$('list').addEventListener('click',e=>{const T=S.tab;
+  if(e.target.id==='cp'){const its=items('chen').filter(i=>num(S.price[i.id])>0),t=sum(),r=num(S.rate);
+    if(!its.length){$('cpm').textContent='還沒有填任何金額';return}
+    const txt=['陳怪廷 泰國代購明細',...its.map(i=>`${i.n}　${S.qty[i.id]||1} ${i.u}　฿${num(S.price[i.id])}`),`合計 ฿${t}`+(r?`（匯率 ${r}，約 NT$${Math.round(t*r)}）`:'')].join('\n');
+    (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>$('cpm').textContent='已複製，可以直接貼到 LINE',()=>{$('cpm').textContent='無法自動複製，請長按下面文字複製：\n'+txt});return}
+  const q=e.target.closest('[data-q]');
+  if(q){const id=q.dataset.q;S.qty[id]=Math.max(1,(S.qty[id]||1)+ +q.dataset.v);save();q.parentElement.querySelector('b').textContent=S.qty[id];return}
+  const dl=e.target.closest('[data-del]');
+  if(dl){const id=dl.dataset.del;if(delArm!==id){delArm=id;render();return}
+    S.custom[T]=S.custom[T].filter(c=>c.id!==id);delete S.done[key(T,id)];delete S.price[id];delete S.qty[id];delArm='';save();render();return}
+  const c=e.target.closest('.chk');
+  if(c){const id=c.dataset.k,k=key(T,id),now=!S.done[k];if(now)S.done[k]=1;else delete S.done[k];save();render();
+    if(now){const left=items(T).filter(i=>!isDone(T,i.id)).length;
+      toast(!!P[T].groups?(left?`找到了！還有 ${left} 款`:'全部找到啦！'):left?(T==='eat'?`好吃！還有 ${left} 家`:`買到了！還剩 ${left} 樣`):(T==='eat'?'都吃到啦！':'全部買齊啦！'));
+      const el=document.querySelector(`.chk[data-k="${CSS.escape(id)}"]`);if(el)el.closest('.card').classList.add('pop')}
+    return}
+  const z=e.target.closest('[data-z]');
+  if(z){const it=items(T).find(i=>i.id===z.dataset.z);if(!it)return;
+    $('lbth').textContent=it.th||it.n;$('lbt').textContent=it.th?it.n+(it.d?'　'+it.d:''):(it.d||'');
+    $('lbs').innerHTML=it.img.map(f=>`<div><img src="${esc(f)}" alt=""></div>`).join('');$('lb').classList.add('on');$('lbs').scrollLeft=0}
+});
+let tt;function toast(m){$('tm').textContent=m;$('toast').classList.add('on');clearTimeout(tt);tt=setTimeout(()=>$('toast').classList.remove('on'),1800)}
+const close=()=>$('lb').classList.remove('on');
+$('lbx').addEventListener('click',close);
+$('lb').addEventListener('click',e=>{if(e.target.tagName==='DIV'&&e.target.parentElement.id==='lbs')close()});
+addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+const hd=document.querySelector('header');let mini=false;
+
+render();
+}
+</script>
+</body>
+</html>
